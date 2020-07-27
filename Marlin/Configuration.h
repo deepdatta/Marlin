@@ -71,7 +71,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(Deep Datta, MyKossel1)" // Who made the changes.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**
@@ -86,7 +86,7 @@
  */
 
 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
-#define SHOW_BOOTSCREEN
+//#define SHOW_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
 //#define SHOW_CUSTOM_BOOTSCREEN
@@ -104,7 +104,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 0
+#define SERIAL_PORT -1
 
 /**
  * Select a secondary serial port on the board to use for communication with the host.
@@ -121,18 +121,18 @@
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
  */
-#define BAUDRATE 250000
+#define BAUDRATE 115200
 
 // Enable the Bluetooth serial interface on AT90USB devices
 //#define BLUETOOTH
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_RAMPS_14_EFB
+  #define MOTHERBOARD BOARD_RAMPS_OLD
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-//#define CUSTOM_MACHINE_NAME "3D Printer"
+#define CUSTOM_MACHINE_NAME "Deep_KosselMini1"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like http://www.uuidgenerator.net/version4
@@ -145,7 +145,7 @@
 #define EXTRUDERS 1
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
-#define DEFAULT_NOMINAL_FILAMENT_DIA 3.0
+#define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
 //#define SINGLENOZZLE
@@ -604,6 +604,67 @@
 //#define COREZY
 
 //===========================================================================
+//============================== Delta Settings =============================
+//===========================================================================
+// Enable DELTA kinematics and most of the default configuration for Deltas
+#define DELTA
+
+#if ENABLED(DELTA)
+
+  // Make delta curves from many straight lines (linear interpolation).
+  // This is a trade-off between visible corners (not enough segments)
+  // and processor overload (too many expensive sqrt calls).
+  #define DELTA_SEGMENTS_PER_SECOND 200
+
+  // After homing move down to a height where XY movement is unconstrained
+  //#define DELTA_HOME_TO_SAFE_ZONE
+
+  // Delta calibration menu
+  // uncomment to add three points calibration menu option.
+  // See http://minow.blogspot.com/index.html#4918805519571907051
+  //#define DELTA_CALIBRATION_MENU
+
+  // uncomment to add G33 Delta Auto-Calibration (Enable EEPROM_SETTINGS to store results)
+  //#define DELTA_AUTO_CALIBRATION
+
+  // NOTE NB all values for DELTA_* values MUST be floating point, so always have a decimal point in them
+
+  #if ENABLED(DELTA_AUTO_CALIBRATION)
+    // set the default number of probe points : n*n (1 -> 7)
+    #define DELTA_CALIBRATION_DEFAULT_POINTS 4
+  #endif
+
+  #if EITHER(DELTA_AUTO_CALIBRATION, DELTA_CALIBRATION_MENU)
+    // Set the steprate for papertest probing
+    #define PROBE_MANUALLY_STEP 0.05      // (mm)
+  #endif
+
+  // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
+  #define DELTA_PRINTABLE_RADIUS 80.0     // (mm)
+
+  // Center-to-center distance of the holes in the diagonal push rods.
+  #define DELTA_DIAGONAL_ROD 215.0        // (mm)
+
+  // Distance between bed and nozzle Z home position
+  #define DELTA_HEIGHT 250.00             // (mm) Get this value from G33 auto calibrate
+
+  #define DELTA_ENDSTOP_ADJ { 0.0, 0.0, 0.0 } // Get these values from G33 auto calibrate
+
+  // Horizontal distance bridged by diagonal push rods when effector is centered.
+  #define DELTA_RADIUS 105.2              // (mm) Get this value from G33 auto calibrate
+
+  // Trim adjustments for individual towers
+  // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
+  // measured in degrees anticlockwise looking from above the printer
+  #define DELTA_TOWER_ANGLE_TRIM { 0.0, 0.0, 0.0 } // Get these values from G33 auto calibrate
+
+  // Delta radius and diagonal rod adjustments (mm)
+  //#define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
+  //#define DELTA_DIAGONAL_ROD_TRIM_TOWER { 0.0, 0.0, 0.0 }
+
+#endif
+
+//===========================================================================
 //============================== Endstop Settings ===========================
 //===========================================================================
 
@@ -612,12 +673,12 @@
 // Specify here all the endstop connectors that are connected to any endstop or probe.
 // Almost all printers will be using one per axis. Probes will use one or more of the
 // extra connectors. Leave undefined any used for non-endstop and non-probe purposes.
-#define USE_XMIN_PLUG
-#define USE_YMIN_PLUG
-#define USE_ZMIN_PLUG
-//#define USE_XMAX_PLUG
-//#define USE_YMAX_PLUG
-//#define USE_ZMAX_PLUG
+//#define USE_XMIN_PLUG
+//#define USE_YMIN_PLUG
+#define USE_ZMIN_PLUG // a Z probe
+#define USE_XMAX_PLUG
+#define USE_YMAX_PLUG
+#define USE_ZMAX_PLUG
 
 // Enable pullup for all endstops to prevent a floating state
 #define ENDSTOPPULLUPS
@@ -710,6 +771,7 @@
 //=============================================================================
 // @section motion
 
+// delta speeds must be the same on xyz
 /**
  * Default Settings
  *
@@ -730,14 +792,22 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 4000, 500 }
+// variables to calculate steps
+#define XYZ_FULL_STEPS_PER_ROTATION 200
+#define XYZ_MICROSTEPS 16
+#define XYZ_BELT_PITCH 2
+#define XYZ_PULLEY_TEETH 20
+
+// delta speeds must be the same on xyz
+#define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, DEFAULT_XYZ_STEPS_PER_UNIT, 760*1.1 }  // default steps per unit for Kossel (GT2, 20 tooth)
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 500, 500, 500, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -750,7 +820,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 9000, 9000, 9000, 10000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -777,11 +847,11 @@
  * When changing speed and direction, if the difference is less than the
  * value set here, it may happen instantaneously.
  */
-//#define CLASSIC_JERK
+#define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
   #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
-  #define DEFAULT_ZJERK  0.3
+  #define DEFAULT_YJERK DEFAULT_XJERK
+  #define DEFAULT_ZJERK DEFAULT_XJERK // Must be same as XY for delta
 
   //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
 
@@ -932,9 +1002,40 @@
  */
 //#define SENSORLESS_PROBING
 
-//
-// For Z_PROBE_ALLEN_KEY see the Delta example configurations.
-//
+/**
+ * Allen key retractable z-probe as seen on many Kossel delta printers - http://reprap.org/wiki/Kossel#Automatic_bed_leveling_probe
+ * Deploys by touching z-axis belt. Retracts by pushing the probe down. Uses Z_MIN_PIN.
+ */
+#define Z_PROBE_ALLEN_KEY
+
+#if ENABLED(Z_PROBE_ALLEN_KEY)
+  // 2 or 3 sets of coordinates for deploying and retracting the spring loaded touch probe on G29,
+  // if servo actuated touch probe is not defined. Uncomment as appropriate for your printer/probe.
+
+  // Kossel Mini
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_1 { 30.0, DELTA_PRINTABLE_RADIUS, 100.0 }
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_1_FEEDRATE XY_PROBE_SPEED
+
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_2 { 0.0, DELTA_PRINTABLE_RADIUS, 100.0 }
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_2_FEEDRATE (XY_PROBE_SPEED)/10
+
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_3 { 0.0, (DELTA_PRINTABLE_RADIUS) * 0.75, 100.0 }
+  #define Z_PROBE_ALLEN_KEY_DEPLOY_3_FEEDRATE XY_PROBE_SPEED
+
+  #define Z_PROBE_ALLEN_KEY_STOW_DEPTH 20
+  #define Z_PROBE_ALLEN_KEY_STOW_1 { -64.0, 56.0, 23.0 } // Move the probe into position
+  #define Z_PROBE_ALLEN_KEY_STOW_1_FEEDRATE XY_PROBE_SPEED
+  // Move the nozzle down further to push the probe into retracted position.
+  #define Z_PROBE_ALLEN_KEY_STOW_2 { -64.0, 56.0, 23.0-(Z_PROBE_ALLEN_KEY_STOW_DEPTH) }
+  #define Z_PROBE_ALLEN_KEY_STOW_2_FEEDRATE (XY_PROBE_SPEED)/10
+  // Raise things back up slightly so we don't bump into anything
+  #define Z_PROBE_ALLEN_KEY_STOW_3 { -64.0, 56.0, 23.0+(Z_PROBE_ALLEN_KEY_STOW_DEPTH) }
+  #define Z_PROBE_ALLEN_KEY_STOW_3_FEEDRATE (XY_PROBE_SPEED)/2
+
+  #define Z_PROBE_ALLEN_KEY_STOW_4 { 0.0, 0.0, 23.0+(Z_PROBE_ALLEN_KEY_STOW_DEPTH) }
+  #define Z_PROBE_ALLEN_KEY_STOW_4_FEEDRATE XY_PROBE_SPEED
+
+#endif // Z_PROBE_ALLEN_KEY
 
 /**
  * Z Probe to nozzle (X,Y) offset, relative to (0, 0).
@@ -956,14 +1057,14 @@
  *
  * Specify a Probe position as { X, Y, Z }
  */
-#define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { 0, -10, -3.5 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
 #define MIN_PROBE_EDGE 10
 
 // X and Y axis travel speed (mm/m) between probes
-#define XY_PROBE_SPEED 8000
+#define XY_PROBE_SPEED 4000
 
 // Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
 #define Z_PROBE_SPEED_FAST HOMING_FEEDRATE_Z
@@ -997,7 +1098,7 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   10 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_DEPLOY_PROBE   50 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
 #define Z_CLEARANCE_MULTI_PROBE     5 // Z Clearance between multiple probes
 //#define Z_AFTER_PROBING           5 // Z position after probing is done
@@ -1057,7 +1158,7 @@
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR false
-#define INVERT_Y_DIR true
+#define INVERT_Y_DIR false
 #define INVERT_Z_DIR false
 
 // @section extruder
@@ -1078,30 +1179,30 @@
 
 //#define UNKNOWN_Z_NO_RAISE      // Don't raise Z (lower the bed) if Z is "unknown." For beds that fall when Z is powered off.
 
-//#define Z_HOMING_HEIGHT  4      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
+//#define Z_HOMING_HEIGHT 15      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                   // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
 //#define Z_AFTER_HOMING  10      // (mm) Height to move to after homing Z
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
-#define X_HOME_DIR -1
-#define Y_HOME_DIR -1
-#define Z_HOME_DIR -1
+#define X_HOME_DIR 1  // deltas always home to max
+#define Y_HOME_DIR 1
+#define Z_HOME_DIR 1
 
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 200
-#define Y_BED_SIZE 200
+#define X_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
+#define Y_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
-#define Y_MIN_POS 0
+#define X_MIN_POS -(DELTA_PRINTABLE_RADIUS)
+#define Y_MIN_POS -(DELTA_PRINTABLE_RADIUS)
 #define Z_MIN_POS 0
-#define X_MAX_POS X_BED_SIZE
-#define Y_MAX_POS Y_BED_SIZE
-#define Z_MAX_POS 200
+#define X_MAX_POS DELTA_PRINTABLE_RADIUS
+#define Y_MAX_POS DELTA_PRINTABLE_RADIUS
+#define Z_MAX_POS MANUAL_Z_HOME_POS
 
 /**
  * Software Endstops
@@ -1251,7 +1352,8 @@
 #if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 3
+  // Works best with 5 or more points in each dimension.
+  #define GRID_MAX_POINTS_X 9
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column
@@ -1339,13 +1441,13 @@
 // @section homing
 
 // The center of the bed is at (X=0, Y=0)
-//#define BED_CENTER_AT_0_0
+#define BED_CENTER_AT_0_0
 
 // Manually set the home position. Leave these undefined for automatic settings.
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-//#define MANUAL_Z_HOME_POS 0
+#define MANUAL_Z_HOME_POS DELTA_HEIGHT // Distance between the nozzle to printbed after homing
 
 // Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
 //
@@ -1363,9 +1465,8 @@
   #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)    // Y point for Z homing when homing all axes (G28).
 #endif
 
-// Homing speeds (mm/m)
-#define HOMING_FEEDRATE_XY (50*60)
-#define HOMING_FEEDRATE_Z  (4*60)
+// Delta only homes to Z
+#define HOMING_FEEDRATE_Z  (200*60)
 
 // Validate that endstops are triggered on homing moves
 #define VALIDATE_HOMING_ENDSTOPS
@@ -1445,7 +1546,6 @@
 //#define EEPROM_SETTINGS     // Persistent storage with M500 and M501
 //#define DISABLE_M503        // Saves ~2700 bytes of PROGMEM. Disable for release!
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
-#define EEPROM_BOOT_SILENT    // Keep M503 quiet and only give errors during first load
 #if ENABLED(EEPROM_SETTINGS)
   //#define EEPROM_AUTO_INIT  // Init EEPROM automatically on any errors.
 #endif
@@ -1498,7 +1598,7 @@
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z_raise }
-  #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), (Y_MAX_POS - 10), 20 }
+  #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), 0, 20 }
   #define NOZZLE_PARK_XY_FEEDRATE 100   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
   #define NOZZLE_PARK_Z_FEEDRATE 5      // (mm/s) Z axis feedrate (not used for delta printers)
 #endif
