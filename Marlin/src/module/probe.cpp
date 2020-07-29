@@ -301,7 +301,7 @@ FORCE_INLINE void probe_specific_action(const bool deploy) {
       #if ENABLED(EXTENSIBLE_UI)
         ExtUI::onUserConfirmRequired_P(PSTR("Stow Probe"));
       #endif
-      wait_for_user_response();
+      wait_for_user_response(3000);
       ui.reset_status();
 
     } while(

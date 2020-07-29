@@ -640,7 +640,7 @@
   #endif
 
   // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-  #define DELTA_PRINTABLE_RADIUS 80.0     // (mm)
+  #define DELTA_PRINTABLE_RADIUS 90.0     // (mm)
 
   // Center-to-center distance of the holes in the diagonal push rods.
   #define DELTA_DIAGONAL_ROD 245.0        // (mm)
@@ -1113,9 +1113,10 @@
 //#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // Before deploy/stow pause for user confirmation
-//#define PAUSE_BEFORE_DEPLOY_STOW
+#define PAUSE_BEFORE_DEPLOY_STOW
 #if ENABLED(PAUSE_BEFORE_DEPLOY_STOW)
-  //#define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe
+  #define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe
+  #define HAS_RESUME_CONTINUE 1
 #endif
 
 /**
