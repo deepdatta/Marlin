@@ -1404,6 +1404,11 @@
 #define HAS_Z4_MAX (PIN_EXISTS(Z4_MAX))
 #define HAS_Z_MIN_PROBE_PIN (HAS_CUSTOM_PROBE_PIN && PIN_EXISTS(Z_MIN_PROBE))
 
+#if HAS_CUSTOM_PROBE_PIN
+  #define TEST_PROBE_PIN (READ(Z_MIN_PROBE_PIN) != Z_MIN_PROBE_ENDSTOP_INVERTING)
+#else
+  #define TEST_PROBE_PIN (READ(Z_MIN_PIN) != Z_MIN_ENDSTOP_INVERTING)
+#endif
 //
 // ADC Temp Sensors (Thermistor or Thermocouple with amplifier ADC interface)
 //
